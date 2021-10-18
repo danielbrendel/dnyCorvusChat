@@ -1,0 +1,49 @@
+//Each client will get the text of this file (without comments)
+//when he connects to this server. You can use the following dynamic variables:
+//
+//$author: Developer of this product (Daniel Brendel)
+//$version: The current server program version
+//$platform: The target platform the program is built for
+//$servername: The server name
+//$serverport: The port the server is running on
+//$uptime: The uptime of the server
+//$datetime: The date and time of the servers system clock
+//$forcedclient: The forced client
+//$currentusers: The amount of connected clients
+//$maxusers: The maximal amount of connected clients
+//$currentchans: The amount of created channels
+//$maxchans: The maximal amount of created channels
+//$usernames: The name of each connected user
+//$channames: The name of each created channel
+//$updateurl: The update URL
+//$masterserver: The address + port of the used master server
+//$aotd: The AOTD information
+//$ghostmode: If ghost mode is allowed on this server
+//$pluginamount: Amount of loaded plugins
+//$pluginnames: The list of loaded plugins
+//
+
+####################################################################################
+Welcome to $servername (v$version developed by $author) running on port $serverport.
+------------------------------------------------------------------------------------
+
+Server program is built for platform: $platform.
+
+This is just a MOTD content for testing purposes.
+	
+Information:
+	* Advertisment of the Day: $aotd
+	* Uptime: $uptime hours
+	* Clock: $datetime
+	* Users ($currentusers/$maxusers): [$usernames]
+	* Channels ($currentchans/$maxchans): [$channames]
+	* Forced client: $forcedclient
+	* Update URL: $updateurl
+	* Masterserver: $masterserver
+	* Ghost mode: $ghostmode
+	* Plugins($pluginamount): [$pluginnames]
+
+	
+	-> Visit https://github.com/danielbrendel/
+
+####################################################################################

@@ -1,0 +1,11 @@
+Please store your plugins inside this directory. The CorvusChat server will use this directory for the
+default plugin directory if a plugin shall be loaded. Of course you can use sub directories.
+
+Also it would be nice if your developed plugin has a ccsp_* file name prefix for a better overview.
+Please use "_x64" file name postfix for 64 bit plugin builds and "_x86" file name postfix for 32 bit plugin builds.
+
+Complete example:
+	- 64 bit: ccsp_pluginfilename_x64.dll
+	- 32 bit: ccsp_pluginfilename_x86.dll
+
+Note that you have to put your plugin config files into the scripts directory (or any sub directory).
