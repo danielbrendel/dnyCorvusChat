@@ -1,6 +1,6 @@
 .vs
 /Masterserver/x64
-/x64/Release/Masterserver.exe
-/x64/Release/Masterserver.exp
-/x64/Release/Masterserver.lib
-/x64/Release/Masterserver.pdb
+/x64/Release/Masterserver_x64.exe
+/x64/Release/Masterserver_x64.exp
+/x64/Release/Masterserver_x64.lib
+/x64/Release/Masterserver_x64.pdb
