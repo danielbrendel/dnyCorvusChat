@@ -2,9 +2,9 @@
 
 Developer: Daniel Brendel\
 Version: 0.2\
+License: The MIT License\
 Contact: dbrendel1988@gmail.com\
 Visit: https://github.com/danielbrendel/
-License: The MIT License
 
 ## Description:
 This product is the master server component of the CorvusChat service product. It allows you
