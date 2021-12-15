@@ -4,6 +4,7 @@
 #include "includes.h"
 #include "conparser.h"
 #include "plugins.h"
+#include "configmgr.h"
 
 /*
 	CorvusChat Server (dnyCorvusChat) - Chatserver component
@@ -147,9 +148,9 @@ bool CCSAPI ENG_AddConCommand(char *szCmdName, char *szCmdDescription, const voi
 bool CCSAPI ENG_DeleteConCommand(char* szCmdName);
 bool CCSAPI ENG_ExecScript(const char *szScriptFile);
 void CCSAPI ENG_ExecCode(const char *szScriptCode);
-cvar_s* ENG_RegisterCVar(const char* szName, const CVarType_e eType, const char* pszDefaultValue);
+ConfigMgr::CCVar::cvar_s* ENG_RegisterCVar(const char* szName, const ConfigMgr::CCVar::cvar_type_e eType, const char* pszDefaultValue);
 bool ENG_RemoveCVar(const char* szName);
-cvar_s* ENG_GetCVar(const char* pszName);
+ConfigMgr::CCVar::cvar_s* ENG_GetCVar(const char* pszName);
 bool ENG_SetCVarValueString(const char* pszName, const char* szValue);
 bool ENG_SetCVarValueInteger(const char* pszName, const int iValue);
 bool ENG_SetCVarValueFloat(const char* pszName, const double dblValue);
@@ -220,6 +221,11 @@ void Cmd_PluginPause(CConParser* pParser);
 void Cmd_Update(CConParser* pParser);
 void Cmd_Restart(CConParser* pParser);
 void Cmd_QuitApplication(CConParser* pParser);
+
+void Cmd_Echo(void);
+void Cmd_CreateChannel(void);
+void Cmd_LoadPlugin(void);
+void Cmd_SetBanner(void);
 
 void DV_Author(char* szValue);
 void DV_Version(char* szValue);

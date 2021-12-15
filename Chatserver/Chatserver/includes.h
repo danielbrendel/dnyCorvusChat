@@ -10,6 +10,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <string>
 
 #pragma comment(lib, "WSOCK32.LIB")
 #pragma comment(lib, "WININET.LIB")

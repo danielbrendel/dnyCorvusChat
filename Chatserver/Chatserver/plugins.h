@@ -4,7 +4,7 @@
 #include "includes.h"
 #include "clientsock.h"
 #include "channels.h"
-#include "config.h"
+#include "configmgr.h"
 
 /*
 	CorvusChat Server (dnyCorvusChat) - Chatserver component
@@ -98,11 +98,11 @@ struct enginefunctions_s { //Table of engine functions exported to each plugin
 	//User interface and config functions
 	bool (CCSAPI *CMD_AddConCommand)(char *szCmdName, char *szCmdDescription, const void* pCmdProc);
 	bool (CCSAPI *CMD_DeleteConCommand)(char* szCmdName);
-	bool (CCSAPI *CCE_ExecScript)(const char *szScriptfile);
-	void (CCSAPI *CCE_ExecCode)(const char* szScriptCode);
-	cvar_s* (CCSAPI *CVAR_RegisterCVar)(const char* szName, const CVarType_e eType, const char* pszDefaultValue);
+	bool (CCSAPI *CFG_ExecScript)(const char *szScriptfile);
+	void (CCSAPI *CFG_ExecCode)(const char* szScriptCode);
+	ConfigMgr::CCVar::cvar_s* (CCSAPI *CVAR_RegisterCVar)(const char* szName, const ConfigMgr::CCVar::cvar_type_e eType, const char* pszDefaultValue);
 	bool (CCSAPI *CVAR_RemoveCVar)(const char* szName);
-	cvar_s* (CCSAPI *CVAR_GetCVar)(const char* pszName);
+	ConfigMgr::CCVar::cvar_s* (CCSAPI *CVAR_GetCVar)(const char* pszName);
 	bool (CCSAPI *CVAR_SetCVarValueString)(const char* pszName, const char* szValue);
 	bool (CCSAPI *CVAR_SetCVarValueInteger)(const char* pszName, const int iValue);
 	bool (CCSAPI *CVAR_SetCVarValueFloat)(const char* pszName, const double dblValue);

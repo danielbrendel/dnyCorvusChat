@@ -16,6 +16,7 @@
 #define MAX_NETWORK_STRING_LENGTH 250 //A networked string buffer shall not be larger than this value
 #define MAX_CLANTAG_STR_LEN 20 //Same rule as for networked strings but for clan tag
 #define MAX_SIG_STRING 100 //Maximum amount of a signature chars for client usermsg handlers
+#define CM_CVAR_MAX_STRING_LEN 1024 //Maximum config string length
 
 #define CCSAPI __cdecl //Calling convention for exported functions, event functions and engine functions
 
@@ -51,9 +52,11 @@ enum plugin_result {
 };
 
 enum CVarType_e {
-	CVAR_TYPE_STRING = 0,
-	CVAR_TYPE_INTEGER,
-	CVAR_TYPE_FLOAT
+	CVAR_TYPE_BOOL,
+	CVAR_TYPE_INT,
+	CVAR_TYPE_FLOAT,
+	CVAR_TYPE_DOUBLE,
+	CVAR_TYPE_STRING
 };
 //======================================================================
 
@@ -63,13 +66,29 @@ typedef void (CCSAPI *TCmdFunction)(class CConParser* pParser);
 
 //======================================================================
 struct cvar_s {
-	char szName[CCE_NAME_STRING_LENGTH];
-	CVarType_e eType;
+	std::string szName;
+	cvar_type_e eType;
 	union {
-		char szValue[CCE_STRING_LENGTH];
+		bool bValue;
 		int iValue;
+		float fValue;
 		double dblValue;
+		char szValue[CM_CVAR_MAX_STRING_LEN];
 	};
+
+	virtual std::string GetName(void) { return this->szName; }
+	virtual cvar_type_e GetType(void) { return this->eType; }
+	virtual bool GetBool(void) { return this->bValue; }
+	virtual int GetInt(void) { return this->iValue; }
+	virtual float GetFloat(void) { return this->fValue; }
+	virtual double GetDouble(void) { return this->dblValue; }
+	virtual std::string GetString(void) { return this->szValue; }
+
+	virtual void SetBool(bool bValue) { this->bValue = bValue; }
+	virtual void SetInt(int iValue) { this->iValue = iValue; }
+	virtual void SetFloat(float fValue) { this->fValue = fValue; }
+	virtual void SetDouble(double dblValue) { this->dblValue = dblValue; }
+	virtual void SetString(std::string szValue) { strcpy_s(this->szValue, szValue.c_str()); }
 };
 
 struct ping_s {
@@ -164,8 +183,7 @@ struct globalvars_s {
 	cvar_s* pOutputPrefix; //Determine output (console, log, RCON) prefix: 0 = none, 1 = date, 2 = time, 3 = date and time
 	cvar_s* pPingTimeout; //Specify ping timeout value: minimum 1 minute and maximum 5 minutes
 	char szAppPath[MAX_PATH]; //Programs' running path
-	char szCCEPath[MAX_PATH]; //Path to CCE module
-	char szCCEScripts[MAX_PATH]; //Path to scripts dir
+	char szScripts[MAX_PATH]; //Path to scripts dir
 	char szPluginDir[MAX_PATH]; //Path for plugins
 	char szMOTD[MAX_PATH]; //MOTD file
 	char szIPBanList[MAX_PATH]; //Banlist file
@@ -242,8 +260,8 @@ struct enginefunctions_s { //Table of engine functions exported to each plugin
 	//User interface and config functions
 	void (CCSAPI *CMD_AddConCommand)(char *szCmdName, char *szCmdDescription, const void* pCmdProc);
 	bool (CCSAPI *CMD_DeleteConCommand)(char* szCmdName);
-	bool (CCSAPI *CCE_ExecScript)(const char *szScriptfile);
-	void (CCSAPI *CCE_ExecCode)(const char* szScriptCode);
+	bool (CCSAPI *CFG_ExecScript)(const char *szScriptfile);
+	void (CCSAPI *CFG_ExecCode)(const char* szScriptCode);
 	cvar_s* (CCSAPI *CVAR_RegisterCVar)(const char* szName, const CVarType_e eType, const char* pszDefaultValue);
 	bool (CCSAPI *CVAR_RemoveCVar)(const char* szName);
 	cvar_s* (CCSAPI *CVAR_GetCVar)(const char* pszName);

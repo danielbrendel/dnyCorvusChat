@@ -8,7 +8,7 @@ Visit: https://github.com/danielbrendel/
 ## Description:
 This product is the chat server component of the CorvusChat service product. It allowes you
 to create your own chat server for using in a network (LAN, Internet). You can control it
-via the console interface, CCE scripting and RCON. Users can chat in channels and perform
+via the console interface, config scripting and RCON. Users can chat in channels and perform
 private conversations. This component features all basic required stuff like MOTD, banlist
 and general server management (server password, maximum allowed users/channels, force a
 client version, client admin login, etc.). Also you can extend the server functionallity 
@@ -69,8 +69,6 @@ overview, please have a look at the listing below.
 	- Define RCON password
 	- Handle Console/Script expressions
 	- Return output to the RCON user
-+ CCE based configuration
-	- Corvus Configuration Engine version 5
 + Plugin Engine
 	- Load/Unload plugins
 	- Get plugin informations

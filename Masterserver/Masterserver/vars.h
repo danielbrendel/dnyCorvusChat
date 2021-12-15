@@ -31,7 +31,7 @@
 
 #define CONSOLE_TITLE PROGRAM_NAME " (%d/%d)"
 
-#define PORT 4002
+#define PORT 35403
 
 #define IDENT_GETSERVERLIST 0x01
 #define IDENT_ADDASSERVER 0x02

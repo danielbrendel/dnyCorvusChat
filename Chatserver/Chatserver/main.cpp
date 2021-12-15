@@ -1,6 +1,5 @@
 #include "includes.h"
 #include "vars.h"
-#include "config.h"
 #include "log.h"
 #include "utils.h"
 #include "callbacks.h"
@@ -66,8 +65,8 @@ DWORD WINAPI ConsoleThread(LPVOID lpvArguments)
 		//Read input from standard input
 		std::cin.getline(szExpression, sizeof(szExpression), '\n');
 
-		if (szExpression[0] == '#') //Pass to CCE
-			CCE_ExecCode(&szExpression[1]);
+		if (szExpression[0] == '#') //Pass to config manager
+			g_Objects.oConfigInt.Parse(&szExpression[1]);
 		else //Handle as default console command
 			g_Objects.ConCommand.HandleCommand(szExpression);
 
@@ -110,19 +109,17 @@ BOOL WINAPI ConsoleControlHandler(DWORD dwCtrlType)
 //======================================================================
 
 //======================================================================
-void RegisterStatics(void)
+void ConfigUnknownExpressionHandler(const std::string& szExpression)
 {
-	//Register CCE related constants
+	//Handle unknown expressions
 
-	//Program information
-	CCE_ExecCode("const PROGRAM_NAME \"" PROGRAM_NAME "\"");
-	CCE_ExecCode("const PROGRAM_SHORTCUT \"" PROGRAM_SHORTCUT "\"");
-	CCE_ExecCode("const PROGRAM_VERSION \"" PROGRAM_VERSION "\"");
-	CCE_ExecCode("const PROGRAM_AUTHOR \"" PROGRAM_AUTHOR "\"");
-	CCE_ExecCode("const PROGRAM_CONTACT \"" PROGRAM_CONTACT "\"");
+	if (!szExpression.length())
+		return;
 
-	//Platform information
-	CCE_ExecCode("const PLATFORM \"" PLATFORM "\"");
+	//Try to pass to console
+	if (!g_Objects.ConCommand.HandleCommand(szExpression.c_str())) {
+		ConsolePrint(FOREGROUND_RED, ("Unknown expression: " + szExpression + "\n").c_str());
+	}
 }
 //======================================================================
 
@@ -131,7 +128,7 @@ void SetupEngineFunctions(enginefunctions_s& sEngFuncs)
 {
 	//Assign function pointers to engine structure members
 
-#define ASSIGN_ENGINEFUNCTION(pfn, prefix) sEngFuncs.##prefix##pfn = &ENG_##pfn
+	#define ASSIGN_ENGINEFUNCTION(pfn, prefix) sEngFuncs.##prefix##pfn = &ENG_##pfn
 
 	ASSIGN_ENGINEFUNCTION(GetServerVersion, VER_);
 	ASSIGN_ENGINEFUNCTION(GetInterfaceVersion, VER_);
@@ -175,8 +172,8 @@ void SetupEngineFunctions(enginefunctions_s& sEngFuncs)
 	ASSIGN_ENGINEFUNCTION(MessageEnd, UMSG_);
 	ASSIGN_ENGINEFUNCTION(AddConCommand, CMD_);
 	ASSIGN_ENGINEFUNCTION(DeleteConCommand, CMD_);
-	ASSIGN_ENGINEFUNCTION(ExecScript, CCE_);
-	ASSIGN_ENGINEFUNCTION(ExecCode, CCE_);
+	ASSIGN_ENGINEFUNCTION(ExecScript, CFG_);
+	ASSIGN_ENGINEFUNCTION(ExecCode, CFG_);
 	ASSIGN_ENGINEFUNCTION(RegisterCVar, CVAR_);
 	ASSIGN_ENGINEFUNCTION(RemoveCVar, CVAR_);
 	ASSIGN_ENGINEFUNCTION(GetCVar, CVAR_);
@@ -238,81 +235,112 @@ bool RegisterCVars(void)
 {
 	//Register all CVars
 
-	g_GlobalVars.pSendType = g_Objects.CVarMgr.RegisterCVar("net_sendsystem", CVAR_TYPE_INTEGER, "1");
+	#define RCV_REGISTER(n, t, d) g_Objects.oConfigInt.CCVar::Add(n, t, d)
+
+	g_GlobalVars.pSendType = RCV_REGISTER("net_sendsystem", ConfigMgr::CCVar::CVAR_TYPE_INT, "1");
 	if (!g_GlobalVars.pSendType)
 		return false;
 
-	g_GlobalVars.pSingleaddrAmount = g_Objects.CVarMgr.RegisterCVar("net_singleaddramount", CVAR_TYPE_INTEGER, "5");
+	g_GlobalVars.pSingleaddrAmount = RCV_REGISTER("net_singleaddramount", ConfigMgr::CCVar::CVAR_TYPE_INT, "5");
 	if (!g_GlobalVars.pSingleaddrAmount)
 		return false;
 
-	g_GlobalVars.pClientPort = g_Objects.CVarMgr.RegisterCVar("net_port", CVAR_TYPE_INTEGER, "4007");
+	g_GlobalVars.pClientPort = RCV_REGISTER("net_port", ConfigMgr::CCVar::CVAR_TYPE_INT, "35400");
 	if (!g_GlobalVars.pClientPort)
 		return false;
 
-	g_GlobalVars.pRConPort = g_Objects.CVarMgr.RegisterCVar("net_rconport", CVAR_TYPE_INTEGER, "4008");
+	g_GlobalVars.pRConPort = RCV_REGISTER("net_rconport", ConfigMgr::CCVar::CVAR_TYPE_INT, "35401");
 	if (!g_GlobalVars.pRConPort)
 		return false;
 
-	g_GlobalVars.pServerName = g_Objects.CVarMgr.RegisterCVar("sv_name", CVAR_TYPE_STRING, "CorvusChat Chatserver");
+	g_GlobalVars.pServerName = RCV_REGISTER("sv_name", ConfigMgr::CCVar::CVAR_TYPE_STRING, "CorvusChat Chatserver");
 	if (!g_GlobalVars.pServerName)
 		return false;
 
-	g_GlobalVars.pUpdateURL = g_Objects.CVarMgr.RegisterCVar("upd_netresource", CVAR_TYPE_STRING, "");
+	g_GlobalVars.pUpdateURL = RCV_REGISTER("upd_netresource", ConfigMgr::CCVar::CVAR_TYPE_STRING, "");
 	if (!g_GlobalVars.pUpdateURL)
 		return false;
 
-	g_GlobalVars.pServerPW = g_Objects.CVarMgr.RegisterCVar("sv_serverpw", CVAR_TYPE_STRING, "#0");
+	g_GlobalVars.pServerPW = RCV_REGISTER("sv_serverpw", ConfigMgr::CCVar::CVAR_TYPE_STRING, "#0");
 	if (!g_GlobalVars.pServerPW)
 		return false;
 
-	g_GlobalVars.pRConPW = g_Objects.CVarMgr.RegisterCVar("cnt_rconpw", CVAR_TYPE_STRING, "password");
+	g_GlobalVars.pRConPW = RCV_REGISTER("cnt_rconpw", ConfigMgr::CCVar::CVAR_TYPE_STRING, "password");
 	if (!g_GlobalVars.pRConPW)
 		return false;
 
-	g_GlobalVars.pLogToDisc = g_Objects.CVarMgr.RegisterCVar("fl_logtodisc", CVAR_TYPE_INTEGER, "0");
+	g_GlobalVars.pLogToDisc = RCV_REGISTER("fl_logtodisc", ConfigMgr::CCVar::CVAR_TYPE_INT, "0");
 	if (!g_GlobalVars.pLogToDisc)
 		return false;
 
-	g_GlobalVars.pMaxChannels = g_Objects.CVarMgr.RegisterCVar("sv_maxchans", CVAR_TYPE_INTEGER, "100");
+	g_GlobalVars.pMaxChannels = RCV_REGISTER("sv_maxchans", ConfigMgr::CCVar::CVAR_TYPE_INT, "100");
 	if (!g_GlobalVars.pMaxChannels)
 		return false;
 
-	g_GlobalVars.pMaxUsers = g_Objects.CVarMgr.RegisterCVar("sv_maxuser", CVAR_TYPE_INTEGER, "100");
+	g_GlobalVars.pMaxUsers = RCV_REGISTER("sv_maxuser", ConfigMgr::CCVar::CVAR_TYPE_INT, "100");
 	if (!g_GlobalVars.pMaxUsers)
 		return false;
 
-	g_GlobalVars.pMSAddr = g_Objects.CVarMgr.RegisterCVar("ms_address", CVAR_TYPE_STRING, "");
+	g_GlobalVars.pMSAddr = RCV_REGISTER("ms_address", ConfigMgr::CCVar::CVAR_TYPE_STRING, "");
 	if (!g_GlobalVars.pMSAddr)
 		return false;
 
-	g_GlobalVars.pMSPort = g_Objects.CVarMgr.RegisterCVar("ms_port", CVAR_TYPE_INTEGER, "4002");
+	g_GlobalVars.pMSPort = RCV_REGISTER("ms_port", ConfigMgr::CCVar::CVAR_TYPE_INT, "35403");
 	if (!g_GlobalVars.pMSPort)
 		return false;
 
-	g_GlobalVars.pGhostModeAllowed = g_Objects.CVarMgr.RegisterCVar("sv_gmallowed", CVAR_TYPE_INTEGER, "0");
+	g_GlobalVars.pGhostModeAllowed = RCV_REGISTER("sv_gmallowed", ConfigMgr::CCVar::CVAR_TYPE_INT, "0");
 	if (!g_GlobalVars.pGhostModeAllowed)
 		return false;
 
-	g_GlobalVars.pForcedClient = g_Objects.CVarMgr.RegisterCVar("sv_fclient", CVAR_TYPE_STRING, "#0");
+	g_GlobalVars.pForcedClient = RCV_REGISTER("sv_fclient", ConfigMgr::CCVar::CVAR_TYPE_STRING, "#0");
 	if (!g_GlobalVars.pForcedClient)
 		return false;
 
-	g_GlobalVars.pAdminPW = g_Objects.CVarMgr.RegisterCVar("cnt_adminpw", CVAR_TYPE_STRING, "password");
+	g_GlobalVars.pAdminPW = RCV_REGISTER("cnt_adminpw", ConfigMgr::CCVar::CVAR_TYPE_STRING, "password");
 	if (!g_GlobalVars.pAdminPW)
 		return false;
 
-	g_GlobalVars.pLogClientActions = g_Objects.CVarMgr.RegisterCVar("out_logclientactions", CVAR_TYPE_INTEGER, "1");
+	g_GlobalVars.pLogClientActions = RCV_REGISTER("out_logclientactions", ConfigMgr::CCVar::CVAR_TYPE_INT, "1");
 	if (!g_GlobalVars.pLogClientActions)
 		return false;
 
-	g_GlobalVars.pOutputPrefix = g_Objects.CVarMgr.RegisterCVar("out_setoutputprefix", CVAR_TYPE_INTEGER, "0");
+	g_GlobalVars.pOutputPrefix = RCV_REGISTER("out_setoutputprefix", ConfigMgr::CCVar::CVAR_TYPE_INT, "0");
 	if (!g_GlobalVars.pOutputPrefix)
 		return false;
 
-	g_GlobalVars.pPingTimeout = g_Objects.CVarMgr.RegisterCVar("net_pingtimeout", CVAR_TYPE_INTEGER, "3");
+	g_GlobalVars.pPingTimeout = RCV_REGISTER("net_pingtimeout", ConfigMgr::CCVar::CVAR_TYPE_INT, "3");
 	if (!g_GlobalVars.pPingTimeout)
 		return false;
+
+	RCV_REGISTER("sys_platform", ConfigMgr::CCVar::CVAR_TYPE_STRING, PLATFORM);
+
+	return true;
+}
+//======================================================================
+
+//======================================================================
+bool AddCommands(void)
+{
+	//Add script commands
+
+	#define AC_ADD(n, d, pfn) g_Objects.oConfigInt.CCommand::Add(n, d, pfn)
+
+	if (!AC_ADD("echo", "Print text to output", &Cmd_Echo)) {
+		return false;
+	}
+
+	if (!AC_ADD("createchannel", "Create a channel", &Cmd_CreateChannel)) {
+		return false;
+	}
+
+	if (!AC_ADD("loadplugin", "Load a plugin", &Cmd_LoadPlugin)) {
+		return false;
+	}
+
+	if (!AC_ADD("setbanner", "Set banner info", &Cmd_SetBanner)) {
+		return false;
+	}
 
 	return true;
 }
@@ -323,12 +351,8 @@ bool InitializeComponents(void)
 {
 	//Initialize all components
 
-	//Initialize CCE
-	BYTE ucCCEResult = InitCCE();
-	if (ucCCEResult != CCE_ENO) {
-		FatalError("[Fatal Error] Could not initialize CCE (%s -> %d)", CCE_FILE_NAME, ucCCEResult);
-		return false;
-	}
+	//Setup config manager
+	g_Objects.oConfigInt.SetUnknownExpressionInformer(&ConfigUnknownExpressionHandler);
 	
 	//Register CVars
 	if (!RegisterCVars()) {
@@ -338,11 +362,16 @@ bool InitializeComponents(void)
 
 	ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, "CVars registered\n");
 
-	//Register statics
-	RegisterStatics();
+	//Register commands
+	if (!AddCommands()) {
+		FatalError("[Fatal Error] AddCommands failed");
+		return false;
+	}
+
+	ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, "Commands added\n");
 
 	//Execute preinit config
-	CCE_ExecScript("preinit.cfg");
+	g_Objects.oConfigInt.Execute("scripts\\preinit.cfg");
 
 	//Check for plugin event functions
 	for (PLUGINID pid = 0; pid < g_Objects.Plugins.GetPluginCount(); pid++) {
@@ -363,7 +392,7 @@ bool InitializeComponents(void)
     }
 	
 	//Execute main config
-	CCE_ExecScript("_main.cfg");
+	g_Objects.oConfigInt.Execute("scripts\\main.cfg");
 
 	//Create log file if desired
 	if (g_GlobalVars.pLogToDisc->iValue) {
@@ -486,9 +515,9 @@ bool InitializeComponents(void)
 	(g_Objects.MOTD.Reload(g_GlobalVars.szMOTD)) ? ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, "MOTD content loaded from: %s\n", g_GlobalVars.szMOTD) : ConsolePrint(FOREGROUND_RED, "Could not load MOTD content from: %s\n", g_GlobalVars.szMOTD);
 
 	//Execute other script files
-	CCE_ExecScript("channels.cfg"); //For channel specific issues
-	CCE_ExecScript("plugins.cfg"); //For plugin issues
-	CCE_ExecScript("userconfig.cfg"); //For all other configurations of the admin
+	g_Objects.oConfigInt.Execute("scripts\\channels.cfg"); //For channel specific issues
+	g_Objects.oConfigInt.Execute("scripts\\plugins.cfg"); //For plugin issues
+	g_Objects.oConfigInt.Execute("scripts\\userconfig.cfg"); //For all other configurations of the admin
 
 	//Check for plugin event functions
 	for (PLUGINID pid = 0; pid < g_Objects.Plugins.GetPluginCount(); pid++) {
@@ -629,8 +658,6 @@ void ShutdownComponents(void)
 	g_Objects.CTPM.Clear();
 
 	g_Objects.BanList.SaveToFile(g_GlobalVars.szIPBanList);
-	
-	CCE_FreeLibrary();
 
 	if (g_GlobalVars.pLogToDisc->iValue)
 		CloseLog();
@@ -695,8 +722,7 @@ int main(int argc, char* argv[])
 		g_GlobalVars.szAppPath[i] = 0;
 	}
 
-	sprintf_s(g_GlobalVars.szCCEPath, "%sbin", g_GlobalVars.szAppPath);
-	sprintf_s(g_GlobalVars.szCCEScripts, "%sscripts", g_GlobalVars.szAppPath);
+	sprintf_s(g_GlobalVars.szScripts, "%sscripts", g_GlobalVars.szAppPath);
 	sprintf_s(g_GlobalVars.szIPBanList, "%stxt\\banlist.txt", g_GlobalVars.szAppPath);
 	sprintf_s(g_GlobalVars.szMOTD, "%stxt\\motd.txt", g_GlobalVars.szAppPath);
 	sprintf_s(g_GlobalVars.szPluginDir, "%splugins\\", g_GlobalVars.szAppPath);

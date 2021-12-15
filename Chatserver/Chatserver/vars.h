@@ -12,8 +12,8 @@
 #include "masterserver.h"
 #include "motd.h"
 #include "validstr.h"
+#include "configmgr.h"
 #include "dynvars.h"
-#include "config.h"
 
 /*
 	CorvusChat Server (dnyCorvusChat) - Chatserver component
@@ -153,28 +153,27 @@ struct aotd_s {
 };
 
 struct globalvars_s {
-	cvar_s* pSendType; //Direct sending or adding to message buffer
-	cvar_s* pSingleaddrAmount; //Amount of allowed connections from a single IP-Address
-	cvar_s* pClientPort; //Port for client listeners
-	cvar_s* pRConPort; //Port for rcon
-	cvar_s* pServerName; //Chatserver name
-	cvar_s* pUpdateURL; //URL where to retrieve program updates
-	cvar_s* pServerPW; //Password to login to server. '#0' means no password
-	cvar_s* pRConPW; //Remote control password
-	cvar_s* pLogToDisc; //Used to determine if console outputs shall be logged to hard disc
-	cvar_s* pMaxChannels; //Maximum amount of existing channels
-	cvar_s* pMaxUsers; //Maximum amount of users
-	cvar_s* pMSAddr; //Masterserver address
-	cvar_s* pMSPort; //Masterserver port
-	cvar_s* pGhostModeAllowed; //If ghostmode is allowed
-	cvar_s* pForcedClient; //The forced client
-	cvar_s* pAdminPW; //Admin password
-	cvar_s* pLogClientActions; //Log some client actions (Connect, Join, Disconnect, Private/Channel messages, (Chan-)Admin authentication)
-	cvar_s* pOutputPrefix; //Determine output (console, log, RCON) prefix: 0 = none, 1 = date, 2 = time, 3 = date and time
-	cvar_s* pPingTimeout; //Specify ping timeout value: minimum 1 minute and maximum 5 minutes
+	ConfigMgr::CCVar::cvar_s* pSendType; //Direct sending or adding to message buffer
+	ConfigMgr::CCVar::cvar_s* pSingleaddrAmount; //Amount of allowed connections from a single IP-Address
+	ConfigMgr::CCVar::cvar_s* pClientPort; //Port for client listeners
+	ConfigMgr::CCVar::cvar_s* pRConPort; //Port for rcon
+	ConfigMgr::CCVar::cvar_s* pServerName; //Chatserver name
+	ConfigMgr::CCVar::cvar_s* pUpdateURL; //URL where to retrieve program updates
+	ConfigMgr::CCVar::cvar_s* pServerPW; //Password to login to server. '#0' means no password
+	ConfigMgr::CCVar::cvar_s* pRConPW; //Remote control password
+	ConfigMgr::CCVar::cvar_s* pLogToDisc; //Used to determine if console outputs shall be logged to hard disc
+	ConfigMgr::CCVar::cvar_s* pMaxChannels; //Maximum amount of existing channels
+	ConfigMgr::CCVar::cvar_s* pMaxUsers; //Maximum amount of users
+	ConfigMgr::CCVar::cvar_s* pMSAddr; //Masterserver address
+	ConfigMgr::CCVar::cvar_s* pMSPort; //Masterserver port
+	ConfigMgr::CCVar::cvar_s* pGhostModeAllowed; //If ghostmode is allowed
+	ConfigMgr::CCVar::cvar_s* pForcedClient; //The forced client
+	ConfigMgr::CCVar::cvar_s* pAdminPW; //Admin password
+	ConfigMgr::CCVar::cvar_s* pLogClientActions; //Log some client actions (Connect, Join, Disconnect, Private/Channel messages, (Chan-)Admin authentication)
+	ConfigMgr::CCVar::cvar_s* pOutputPrefix; //Determine output (console, log, RCON) prefix: 0 = none, 1 = date, 2 = time, 3 = date and time
+	ConfigMgr::CCVar::cvar_s* pPingTimeout; //Specify ping timeout value: minimum 1 minute and maximum 5 minutes
 	char szAppPath[MAX_PATH]; //Programs' running path
-	char szCCEPath[MAX_PATH]; //Path to CCE module
-	char szCCEScripts[MAX_PATH]; //Path to scripts dir
+	char szScripts[MAX_PATH]; //Path to scripts dir
 	char szPluginDir[MAX_PATH]; //Path for plugins
 	char szMOTD[MAX_PATH]; //MOTD file
 	char szIPBanList[MAX_PATH]; //Banlist file
@@ -196,8 +195,8 @@ struct objects_s {
 	CClientToPluginMsg CTPM;
 	CValidString ValidStr;
 	CMasterServer MasterServer;
+	ConfigMgr::CConfigInt oConfigInt;
 	CDynVars DynVars;
-	CCVarMgr CVarMgr;
 };
 
 struct print_output_s {

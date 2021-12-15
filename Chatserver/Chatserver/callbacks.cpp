@@ -1,7 +1,6 @@
 #include "callbacks.h"
 #include "vars.h"
 #include "utils.h"
-#include "ccesdk.h"
 #include "log.h"
 #include "versionfuncs.h"
 
@@ -1258,27 +1257,27 @@ bool CCSAPI ENG_DeleteConCommand(char* szCmdName)
 //======================================================================
 bool CCSAPI ENG_ExecScript(const char *szScriptFile)
 {
-	//Detour to: CCE_ExecScript
+	//Detour to: ConfigMgr::CConfigInt::Execute
 
-	return CCE_ExecScript(szScriptFile) == TRUE;
+	return g_Objects.oConfigInt.Execute(szScriptFile) == TRUE;
 }
 //======================================================================
 
 //======================================================================
 void CCSAPI ENG_ExecCode(const char *szScriptCode)
 {
-	//Detour to: CCE_ExecCode
+	//Detour to: ConfigMgr::CScriptParser::Parse
 
-	CCE_ExecCode((char*)szScriptCode);
+	g_Objects.oConfigInt.Parse((char*)szScriptCode);
 }
 //======================================================================
 
 //======================================================================
-cvar_s* ENG_RegisterCVar(const char* szName, const CVarType_e eType, const char* pszDefaultValue)
+ConfigMgr::CCVar::cvar_s* ENG_RegisterCVar(const char* szName, const ConfigMgr::CCVar::cvar_type_e eType, const char* pszDefaultValue)
 {
 	//Detour to method
 
-	return g_Objects.CVarMgr.RegisterCVar(szName, eType, pszDefaultValue);
+	return g_Objects.oConfigInt.CCVar::Add(szName, eType, pszDefaultValue);
 }
 //======================================================================
 
@@ -1287,16 +1286,16 @@ bool ENG_RemoveCVar(const char* szName)
 {
 	//Detour to method
 
-	return g_Objects.CVarMgr.RemoveCVar(szName);
+	return g_Objects.oConfigInt.CCVar::Delete(szName);
 }
 //======================================================================
 
 //======================================================================
-cvar_s* ENG_GetCVar(const char* pszName)
+ConfigMgr::CCVar::cvar_s* ENG_GetCVar(const char* pszName)
 {
 	//Detour to method
 
-	return g_Objects.CVarMgr.GetCVar(pszName);
+	return g_Objects.oConfigInt.CCVar::Find(pszName);
 }
 //======================================================================
 
@@ -1305,7 +1304,7 @@ bool ENG_SetCVarValueString(const char* pszName, const char* szValue)
 {
 	//Detour to method
 
-	return g_Objects.CVarMgr.SetCVarValue(pszName, szValue);
+	return g_Objects.oConfigInt.CCVar::Set(pszName, szValue);
 }
 //======================================================================
 
@@ -1314,7 +1313,7 @@ bool ENG_SetCVarValueInteger(const char* pszName, const int iValue)
 {
 	//Detour to method
 
-	return g_Objects.CVarMgr.SetCVarValue(pszName, iValue);
+	return g_Objects.oConfigInt.CCVar::Set(pszName, iValue);
 }
 //======================================================================
 
@@ -1323,7 +1322,7 @@ bool ENG_SetCVarValueFloat(const char* pszName, const double dblValue)
 {
 	//Detour to method
 
-	return g_Objects.CVarMgr.SetCVarValue(pszName, dblValue);
+	return g_Objects.oConfigInt.CCVar::Set(pszName, dblValue);
 }
 //======================================================================
 
@@ -2576,7 +2575,6 @@ void Cmd_Version(CConParser* pParser)
 
 	ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, CMD_STDOUT_PREFIX PROGRAM_NAME " coded by " PROGRAM_AUTHOR " (" PROGRAM_CONTACT ")\n");
 	ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, CMD_STDOUT_PREFIX "Version " PROGRAM_VERSION " :: interface version %s (built for " PLATFORM " platform)\n\n", szIfVer);
-	//ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, CCE_About());
 }
 //======================================================================
 
@@ -2598,8 +2596,7 @@ void Cmd_Status(CConParser* pParser)
 	ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, CMD_STDOUT_PREFIX "Forced client: %s\n", g_GlobalVars.pForcedClient->szValue);
 	ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, CMD_STDOUT_PREFIX "Masterserver status: %s:%d (%d)\n", g_GlobalVars.pMSAddr->szValue, g_GlobalVars.pMSPort->iValue, ENG_IsMSConnected());
 	ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, CMD_STDOUT_PREFIX "Program path: %s\n", g_GlobalVars.szAppPath);
-	ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, CMD_STDOUT_PREFIX "CCE path: %s\n", g_GlobalVars.szCCEPath);
-	ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, CMD_STDOUT_PREFIX "Scripts path: %s\n", g_GlobalVars.szCCEScripts);
+	ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, CMD_STDOUT_PREFIX "Scripts path: %s\n", g_GlobalVars.szScripts);
 	ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, CMD_STDOUT_PREFIX "Plugin path: %s\n", g_GlobalVars.szPluginDir);
 	ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, CMD_STDOUT_PREFIX "MOTD: %s\n", g_GlobalVars.szMOTD);
 	ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, CMD_STDOUT_PREFIX "Banlist: %s\n", g_GlobalVars.szIPBanList);
@@ -2642,7 +2639,7 @@ void Cmd_Exec(CConParser* pParser)
 
 	ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, CMD_STDOUT_PREFIX "Executing script file: %s...\n", szArg);
 
-	(CCE_ExecScript(szArg)) ? ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, CMD_STDOUT_PREFIX "Execution successful\n") : ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, CMD_STDOUT_PREFIX "Execution failed\n");
+	(g_Objects.oConfigInt.Execute(szArg)) ? ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, CMD_STDOUT_PREFIX "Execution successful\n") : ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, CMD_STDOUT_PREFIX "Execution failed\n");
 }
 //======================================================================
 
@@ -3191,6 +3188,78 @@ void Cmd_QuitApplication(CConParser* pParser)
 	//Quit server by setting the main loop control variable to false
 
 	g_bProgramRunning = false;
+}
+//======================================================================
+
+//======================================================================
+void Cmd_Echo(void)
+{
+	//Print text output
+
+	if (g_PrintOutput.type == PO_STDOUT) { //Send text to stdout and log to hard disc (if desired)
+		ConsolePrint(FOREGROUND_PINK, "%s\n", g_Objects.oConfigInt.ExpressionItemValue(1).c_str());
+
+		//long long ulValue = (g_GlobalVars.pLogToDisc) ? g_GlobalVars.pLogToDisc->iValue : 0;
+
+		//if (ulValue)
+			//LogMessage("%s", lpszOutputText);
+	}
+	else if (g_PrintOutput.type == PO_RCON) { //Send text to the rcon using client
+		g_Objects.RCon.SendText(g_Objects.oConfigInt.ExpressionItemValue(1).c_str());
+	}
+}
+//======================================================================
+
+//======================================================================
+void Cmd_CreateChannel(void)
+{
+	//Create a channel
+
+	std::string szArg1 = g_Objects.oConfigInt.ExpressionItemValue(1);
+	std::string szArg2 = g_Objects.oConfigInt.ExpressionItemValue(2);
+	std::string szArg3 = g_Objects.oConfigInt.ExpressionItemValue(3);
+	std::string szArg4 = g_Objects.oConfigInt.ExpressionItemValue(4);
+	std::string szArg5 = g_Objects.oConfigInt.ExpressionItemValue(5);
+
+	ENG_CreateChannel((char*)szArg1.c_str(), (char*)szArg2.c_str(), (char*)szArg3.c_str(), (char*)szArg4.c_str(), atoi(szArg5.c_str()), true);
+}
+//======================================================================
+
+//======================================================================
+void Cmd_LoadPlugin(void)
+{
+	//Load a plugin
+
+	std::string szArg1 = g_Objects.oConfigInt.ExpressionItemValue(1);
+	std::string szArg2 = g_Objects.oConfigInt.ExpressionItemValue(2);
+
+	bool bManually;
+
+	if (szArg2.length())
+		bManually = (BOOL)atoi(szArg2.c_str()) == TRUE;
+	else
+		bManually = false;
+
+	ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, "Loading plugin \"%s\"... ", szArg1.c_str());
+
+	(g_Objects.Plugins.LoadPlugin(szArg1.c_str(), bManually)) ? ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, "Done\n") : ConsolePrint(FOREGROUND_RED, "Failed\n");
+}
+//======================================================================
+
+//======================================================================
+void Cmd_SetBanner(void)
+{
+	//Set banner data
+
+	std::string szArg1 = g_Objects.oConfigInt.ExpressionItemValue(1);
+	std::string szArg2 = g_Objects.oConfigInt.ExpressionItemValue(2);
+	std::string szArg3 = g_Objects.oConfigInt.ExpressionItemValue(3);
+
+	if ((szArg1.length()) && (szArg2.length()) && (szArg3.length())) {
+		strcpy_s(g_GlobalVars.aotd.szURL, szArg1.c_str());
+		g_GlobalVars.aotd.x = atoi(szArg2.c_str());
+		g_GlobalVars.aotd.y = atoi(szArg3.c_str());
+	}
 }
 //======================================================================
 

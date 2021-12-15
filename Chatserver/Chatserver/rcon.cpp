@@ -1,6 +1,5 @@
 #include "rcon.h"
 #include "vars.h"
-#include "ccesdk.h"
 #include "utils.h"
 #include "versionfuncs.h"
 
@@ -121,9 +120,9 @@ VOID CRemoteControl::Process(CConCommand* pConCommand)
 						pConCommand->HandleCommand(szCommand); //Handle the given remote control command
 						rcondata.pPrintOutput->type = R_PO_STDOUT; //Disable rcon handling of ConsolePrint()
 					} else if (cType == ucScriptType) {
-						//Pass buffer to CCE component
+						//Pass buffer to config manager component
 						rcondata.pPrintOutput->type = R_PO_RCON; //Activate rcon handling of EchoEvent()
-						CCE_ExecCode(szCommand);
+						g_Objects.oConfigInt.Parse(szCommand);
 						rcondata.pPrintOutput->type = R_PO_STDOUT; //Disable rcon handling of EchoEvent()
 					}
 				}
