@@ -691,7 +691,7 @@ int main(int argc, char* argv[])
 	SetConsoleTitleA(PROGRAM_NAME " v" PROGRAM_VERSION " Server Console");
 
 	//Print initial information
-	ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, PROGRAM_NAME " v" PROGRAM_VERSION " coded by " PROGRAM_AUTHOR " (" PROGRAM_CONTACT ")\n\n");
+	ConsolePrint(CONSOLE_ATTRIBUTE_DEFAULT, PROGRAM_NAME " v" PROGRAM_VERSION " developed by " PROGRAM_AUTHOR " (" PROGRAM_CONTACT ")\n\n");
 
 	memset(&g_GlobalVars, 0x00, sizeof(globalvars_s));
 

@@ -30,7 +30,7 @@
 //======================================================================
 #define PROGRAM_NAME "CorvusChat Chatserver"
 #define PROGRAM_SHORTCUT "CCS"
-#define PROGRAM_VERSION "0.5 RC5"
+#define PROGRAM_VERSION "0.5"
 #define PROGRAM_AUTHOR "Daniel Brendel"
 #define PROGRAM_CONTACT "dbrendel1988@gmail.com"
 #define PROGRAM_WEBSITE "https://github.com/danielbrendel/"

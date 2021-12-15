@@ -1,7 +1,7 @@
 # CorvusChat (dnyCorvusChat) - Chat Server component
 
 Developer: Daniel Brendel\
-Version: 0.5 RC5\
+Version: 0.5\
 Contact: dbrendel1988@gmail.com\
 Visit: https://github.com/danielbrendel/
 

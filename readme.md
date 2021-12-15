@@ -2,7 +2,7 @@
 
 Developer: Daniel Brendel\
 Contact: dbrendel1988@gmail.com\
-Version: Chatserver v0.5 RC5 Masterserver v0.2\
+Version: Chatserver v0.5 Masterserver v0.2\
 Platforms: Windows x64 and x86 native
 
 ## Component readme files
