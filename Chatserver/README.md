@@ -3,7 +3,7 @@
 Developer: Daniel Brendel\
 Version: 0.5\
 License: The MIT License\
-Contact: dbrendel1988@gmail.com\
+Contact: dbrendel1988(at)gmail(dot)com\
 Visit: https://github.com/danielbrendel/
 
 ## Description:
