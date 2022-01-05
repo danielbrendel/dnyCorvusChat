@@ -230,5 +230,5 @@ Note that every RCon command output will be sent back to the RCon client (which 
 - Edit the config file(s) of the chat server
 - Enable port forwarding by your router/firewall if needed
 - Be sure you are connected with Internet or LAN (or just test it locally)
-- Start the server program executable (x64 name postfix for native 64 bit build or x86 name postfix for native 32 bit build)
+- Start the server program executable
 - Type 'help' into the server console window to get a list of commands
