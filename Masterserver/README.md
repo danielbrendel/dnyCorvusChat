@@ -10,4 +10,4 @@ Visit: https://github.com/danielbrendel/
 This product is the master server component of the CorvusChat service product. It allows you
 to manage a dynamic list of chat servers which are currently online. Chat servers can perform
 an add request to the master server to be added to the server list. Clients can retrieve the
-list to show which servers are currently accessible.
+list to show which servers are currently available.
