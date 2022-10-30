@@ -52,7 +52,7 @@ const char* AddressToString(const unsigned long ulIPAddress)
 	static char str[15];
 	memset(str, 0x00, sizeof(str));
 
-	sprintf_s(str, "%d.%d.%d.%d", *(BYTE*)&ulIPAddress, *(BYTE*)((DWORD)&ulIPAddress + 1), *(BYTE*)((DWORD)&ulIPAddress + 2), *(BYTE*)((DWORD)&ulIPAddress + 3));
+	sprintf_s(str, "%d.%d.%d.%d", *(BYTE*)&ulIPAddress, *(BYTE*)((DWORD_PTR)&ulIPAddress + 1), *(BYTE*)((DWORD_PTR)&ulIPAddress + 2), *(BYTE*)((DWORD_PTR)&ulIPAddress + 3));
 
 	return &str[0];
 }

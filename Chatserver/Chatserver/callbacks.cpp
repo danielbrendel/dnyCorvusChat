@@ -410,7 +410,7 @@ bool CCSAPI ENG_ClientJoined(const CLIENTID ciClientId, const login_s* pLoginInf
 			char* szLine = g_Objects.MOTD.GetLine(i);
 			if (szLine) {
 				//Handle dynvars
-				std::string strDynVar = g_Objects.DynVars.HandleExpression(szLine);
+				std::string strDynVar = g_Objects.DynVars.HandleExpression(szLine) + "\x04";
 
 				g_Objects.UserMsg.WriteString((char*)strDynVar.c_str(), (DWORD)strDynVar.length());
 			}

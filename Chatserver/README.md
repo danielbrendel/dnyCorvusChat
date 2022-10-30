@@ -101,7 +101,7 @@ Each message is prefixed with a message ID that identificates the type of the me
 	+ "ClientInfo": 0x05 (1 + sizeof(clinfo_s) bytes in size) This message contains client informations which a client wants to see
 		- Argument 1 (clinfo_s): A structure containing the client informations
 	+ "MOTD": 0x06 (1 + variable string length) This message contains the current MOTD information
-		- Argument 1 (String): The MOTD text
+		- Argument 1 (String): The MOTD text (lines delimited by special delimiter)
 	+ "ChanCount": 0x07 (5 bytes in size) This message contains the amount of existing channels
 		- Argument 1 (Integer): The amount of existing channels
 	+ "ChanInfo": 0x08 (1 + sizeof(chaninfo_s) bytes in size) This message contains informations about a channel
