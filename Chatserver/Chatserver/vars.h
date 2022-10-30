@@ -172,6 +172,7 @@ struct globalvars_s {
 	ConfigMgr::CCVar::cvar_s* pLogClientActions; //Log some client actions (Connect, Join, Disconnect, Private/Channel messages, (Chan-)Admin authentication)
 	ConfigMgr::CCVar::cvar_s* pOutputPrefix; //Determine output (console, log, RCON) prefix: 0 = none, 1 = date, 2 = time, 3 = date and time
 	ConfigMgr::CCVar::cvar_s* pPingTimeout; //Specify ping timeout value: minimum 1 minute and maximum 5 minutes
+	ConfigMgr::CCVar::cvar_s* pPingDelay; //Wait time between each ping request in seconds
 	char szAppPath[MAX_PATH]; //Programs' running path
 	char szScripts[MAX_PATH]; //Path to scripts dir
 	char szPluginDir[MAX_PATH]; //Path for plugins

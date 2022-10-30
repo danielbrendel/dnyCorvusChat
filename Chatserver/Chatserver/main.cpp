@@ -313,6 +313,10 @@ bool RegisterCVars(void)
 	if (!g_GlobalVars.pPingTimeout)
 		return false;
 
+	g_GlobalVars.pPingDelay = RCV_REGISTER("net_pingdelay", ConfigMgr::CCVar::CVAR_TYPE_INT, "5");
+	if (!g_GlobalVars.pPingDelay)
+		return false;
+
 	RCV_REGISTER("sys_platform", ConfigMgr::CCVar::CVAR_TYPE_STRING, PLATFORM);
 
 	return true;

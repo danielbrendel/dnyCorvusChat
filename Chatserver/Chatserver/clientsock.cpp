@@ -427,7 +427,7 @@ void CClientSocket::CalculateStuff(void)
             
 			//Update timer
 			vClients[i]->ping.curPing = GetTickCount();
-            if (vClients[i]->ping.curPing > vClients[i]->ping.lastPing + MAX_PING_WAIT_TIME) { //If wait time has elapsed
+            if (vClients[i]->ping.curPing > vClients[i]->ping.lastPing + g_GlobalVars.pPingDelay->iValue * 1000) { //If wait time has elapsed
                 vClients[i]->ping.pingAmount++; //Increment counter which counts every elapsed time
 
                 if (vClients[i]->ping.pingAmount> g_GlobalVars.pPingTimeout->iValue * 60) { //Kick client if he did not answer the required ping request within the specified time
