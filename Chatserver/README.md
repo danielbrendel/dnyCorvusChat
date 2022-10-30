@@ -31,7 +31,7 @@ overview, please have a look at the listing below.
 	- Messages from client-to-client
 	- Maximum client amount
 	- Force client login
-	- User profile informations (E-Mail, Country, Full name)
+	- User profile information (E-Mail, Country, Full name)
 	- Admin login via password
 	- Admin actions (kick/ban users, create/delete/edit channels, switch ghost mode)
 + Network management
@@ -56,7 +56,7 @@ overview, please have a look at the listing below.
 	- Modify channel data as admin
 + Masterserver system
 	- Handle Masterserver connection
-	- Update specific server informations to Masterserver
+	- Update specific server information to Masterserver
 + Console interface management
 	- Add console commands via manager (name, description, event function)
 + Daily server information management
@@ -72,7 +72,7 @@ overview, please have a look at the listing below.
 	- Return output to the RCON user
 + Plugin Engine
 	- Load/Unload plugins
-	- Get plugin informations
+	- Get plugin information
 	- Pause plugins
 	- Provided C/C++ SDK
 + Update function
@@ -98,14 +98,14 @@ Each message is prefixed with a message ID that identificates the type of the me
 		- Argument 1 (Byte): The current ping value which the client must send back (pong)
 	+ "ClientCount": 0x04 (5 bytes in size) This message is used to tell the clients the current amount of connected clients
 		- Argument 1 (Integer): The amount of current connected clients
-	+ "ClientInfo": 0x05 (1 + sizeof(clinfo_s) bytes in size) This message contains client informations which a client wants to see
-		- Argument 1 (clinfo_s): A structure containing the client informations
+	+ "ClientInfo": 0x05 (1 + sizeof(clinfo_s) bytes in size) This message contains client information which a client wants to see
+		- Argument 1 (clinfo_s): A structure containing the client information
 	+ "MOTD": 0x06 (1 + variable string length) This message contains the current MOTD information
 		- Argument 1 (String): The MOTD text (lines delimited by special delimiter)
 	+ "ChanCount": 0x07 (5 bytes in size) This message contains the amount of existing channels
 		- Argument 1 (Integer): The amount of existing channels
-	+ "ChanInfo": 0x08 (1 + sizeof(chaninfo_s) bytes in size) This message contains informations about a channel
-		- Argument 1 (chaninfo_s): The channel informations
+	+ "ChanInfo": 0x08 (1 + sizeof(chaninfo_s) bytes in size) This message contains information about a channel
+		- Argument 1 (chaninfo_s): The channel information
 	+ "ChanUsers": 0x09 (1 + MAX_NETWORK_STRING_LENGTH + MAX_CHANUSERS_STRING_LENGTH bytes in size) This message contains a list of channel users of a specific channel
 		- Argument 1 (String): The channel name
 		- Argument 2 (String): The list of users, each name delimited with a specific delimiter
@@ -116,14 +116,14 @@ Each message is prefixed with a message ID that identificates the type of the me
 	+ "PrivMsg": 0x0C (1 + MAX_NETWORK_STRING_LENGTH * 2 bytes in size) A private message from a specific user to a client
 		- Argument 1 (String): The sender of the message
 		- Argument 2 (String): The chat message
-	+ "ChanMsg": 0x0D (1 + MAX_NETWORK_STRING_LENGTH * 2 bytes in size) A channel message from a specific user to a channel
+	+ "ChanMsg": 0x0D (1 + MAX_NETWORK_STRING_LENGTH * 3 bytes in size) A channel message from a specific user to a channel
 		- Argument 1 (String): The sender of the message
 		- Argument 2 (String): The channel name
 		- Argument 3 (String): The chat message
 	+ "ClientJoin": 0x0E (1 + sizeof(CLIENTID) + MAX_NETWORK_STRING_LENGTH bytes in size) An information containing the user ID and name that has joined the chat server
 		- Argument 1 (Integer): The user ID
 		- Argument 2 (String): The user nickname
-	+ "ClientLeave": 0x0F (1 + sizeof(CLIENTID) + MAX_NETWORK_STRING_LENTH*2 bytes in size) An information containing the user ID, name and quit reason of a user that has left the server
+	+ "ClientLeave": 0x0F (1 + sizeof(CLIENTID) + MAX_NETWORK_STRING_LENGTH*2 bytes in size) An information containing the user ID, name and quit reason of a user that has left the server
 		- Argument 1 (Integer): The user ID
 		- Argument 2 (String): The user nickname
 		- Argument 3 (String): The reason why this user has left the server
@@ -173,9 +173,9 @@ Each message is prefixed with a message ID that identificates the type of the me
 	+ Leave channel: 0x0A (1 + sizeof(MAX_NETWORK_STRING_LENGTH) bytes in size) Try to leave a channel
 		- Argument 1 (String): The channel name
 	+ Channel amount: 0x0B (1 byte in size) Query the amount of current existing channels
-	+ Channel info by name: 0x0C (1 + MAX_NETWORK_STRING_LENGTH bytes in size) Query informations about a channel
+	+ Channel info by name: 0x0C (1 + MAX_NETWORK_STRING_LENGTH bytes in size) Query information about a channel
 		- Argument 1 (String): The channel name
-	+ Channel info by ID: 0x1C (1 + sizeof(CHANNELID) bytes in size) Query informations about a channel
+	+ Channel info by ID: 0x1C (1 + sizeof(CHANNELID) bytes in size) Query information about a channel
 		- Argument 1 (Integer): The channel ID
 	+ Channel users: 0x0D (1 + MAX_NETWORK_STRING_LENGTH bytes in size) Query user name list of a channel
 		- Argument 1 (String): The channel name
@@ -218,7 +218,7 @@ RCon messages:
 These messages are used to either get server information or send a remote control command to the server.
 Note that every RCon command output will be sent back to the RCon client (which would normally be put to the console)
 	+ Server information: 0x01 "CCINFO" 0xFF
-		- Force server to send back specific server informations (see serverinfo_udp_s for details)
+		- Force server to send back specific server information (see serverinfo_udp_s for details)
 	+ Server rcon command: 0x02 "CCRCON" 0xFF <password (size: MAX_PASSWORD_LEN)> <cmd_ident: (size: 1 byte)> <expression (size: MAX_RCON_BUFFER)
 		- Force server to handle RCon commands
 		- password: The RCon password
