@@ -163,7 +163,7 @@ void CUserMsg::WriteByte(BYTE bValue)
 {
 	//Write byte to message buffer
 
-	*(unsigned char*)((DWORD)pvuMsgBuf + dwuMsgPos) = bValue;
+	*(unsigned char*)((DWORD_PTR)pvuMsgBuf + dwuMsgPos) = bValue;
 	dwuMsgPos += sizeof(BYTE);
 }
 //======================================================================
@@ -173,7 +173,7 @@ void CUserMsg::WriteChar(char cValue)
 {
 	//Write char to message buffer
 
-	*(char*)((DWORD)pvuMsgBuf + dwuMsgPos) = cValue;
+	*(char*)((DWORD_PTR)pvuMsgBuf + dwuMsgPos) = cValue;
 	dwuMsgPos += sizeof(char);
 }
 //======================================================================
@@ -183,7 +183,7 @@ void CUserMsg::WriteShort(short sValue)
 {
 	//Write short to message buffer
 
-	*(short*)((DWORD)pvuMsgBuf + dwuMsgPos) = sValue;
+	*(short*)((DWORD_PTR)pvuMsgBuf + dwuMsgPos) = sValue;
 	dwuMsgPos += sizeof(short);
 }
 //======================================================================
@@ -193,7 +193,7 @@ void CUserMsg::WriteInt(int iValue)
 {
 	//Write int to message buffer
 
-	*(int*)((DWORD)pvuMsgBuf + dwuMsgPos) = iValue;
+	*(int*)((DWORD_PTR)pvuMsgBuf + dwuMsgPos) = iValue;
 	dwuMsgPos += sizeof(int);
 }
 //======================================================================
@@ -203,7 +203,7 @@ void CUserMsg::WriteFloat(float fValue)
 {
 	//Write float to message buffer
 
-	*(float*)((DWORD)pvuMsgBuf + dwuMsgPos) = fValue;
+	*(float*)((DWORD_PTR)pvuMsgBuf + dwuMsgPos) = fValue;
 	dwuMsgPos += sizeof(float);
 }
 //======================================================================
@@ -226,7 +226,7 @@ void CUserMsg::WriteBuf(void* pBuf, DWORD dwBufSize)
 {
 	//Copies a buffer to the message buffer
 
-	memcpy((void*)((DWORD)pvuMsgBuf + dwuMsgPos), pBuf, dwBufSize);
+	memcpy((void*)((DWORD_PTR)pvuMsgBuf + dwuMsgPos), pBuf, dwBufSize);
 	dwuMsgPos += dwBufSize;
 }
 //======================================================================
