@@ -711,7 +711,7 @@ int main(int argc, char* argv[])
 	#define ID_CCICON 101
 	HICON hIcon = (HICON)LoadImageA(0, MAKEINTRESOURCEA(ID_CCICON), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 	if (!hIcon) {
-		FatalError("[Fatal Error] LoadImageA failed: %d", GetLastError()); 
+		ConsolePrint(FOREGROUND_YELLOW, "[Warning] LoadImageA failed: %d", GetLastError());
 	}
 
 	//Get application path
