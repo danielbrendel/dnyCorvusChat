@@ -98,8 +98,8 @@ VOID ConsolePrint(WORD wConAttributes, LPCSTR lpszFmt, ...)
 		if (!SetConsoleTextAttribute(hStdOut, csbi.wAttributes))
 			FatalError("Error: SetConsoleTextAttribute failed: %d", GetLastError());
 
-		long long ulLDValue = (g_GlobalVars.pLogToDisc) ? g_GlobalVars.pLogToDisc->iValue : 0;
-		if (ulLDValue) {
+		int iLDValue = (g_GlobalVars.pLogToDisc) ? g_GlobalVars.pLogToDisc->iValue : 0;
+		if (iLDValue) {
 			LogMessage("%s", szOutputBuffer);
 		}
 	} else if (g_PrintOutput.type == PO_RCON) { //Send text to the rcon using client

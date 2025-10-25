@@ -39,8 +39,8 @@ void FatalError(const char* szErrMsg, ...)
 	va_end(vaList);
 
 	//Log to hard disc if desired
-	long long ulValue = (g_GlobalVars.pLogToDisc) ? g_GlobalVars.pLogToDisc->iValue : 0;
-	if (g_GlobalVars.pLogToDisc->iValue)
+	int iFlagValue = (g_GlobalVars.pLogToDisc) ? g_GlobalVars.pLogToDisc->iValue : 0;
+	if (iFlagValue)
 		LogError("%s", szBuffer);
 
 	//Show message
@@ -711,7 +711,7 @@ int main(int argc, char* argv[])
 	#define ID_CCICON 101
 	HICON hIcon = (HICON)LoadImageA(0, MAKEINTRESOURCEA(ID_CCICON), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 	if (!hIcon) {
-		ConsolePrint(FOREGROUND_YELLOW, "[Warning] LoadImageA failed: %d", GetLastError());
+		ConsolePrint(FOREGROUND_YELLOW, "[Warning] LoadImageA failed: %d\n", GetLastError());
 	}
 
 	//Get application path

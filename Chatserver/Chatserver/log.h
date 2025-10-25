@@ -20,6 +20,8 @@
 //======================================================================
 bool CreateLog(const char *lpszFileName, bool CreateNew);
 void LogMessage(const char *lpszMessage, ...);
+void LogSuccess(const char* lpszMessage, ...);
+void LogWarning(const char* lpszWarning, ...);
 void LogError(const char *lpszError, ...);
 void CloseLog(void);
 //======================================================================
